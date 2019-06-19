@@ -1,22 +1,25 @@
 import telebot
+import conf
 from wisdom_generation import generate_wisdom, is_question, not_question
 import random
 import os
-from flask import Flask
+import flask
 
 NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather - action.',
                 'Tell me what answers you seek.',
                 'Wisdom is to be beseeched for. Ask a question.'
                 'You shall not think lightly of the Wisdom I am about to bestow upon you. Ask a question and ponder the answer.']
 
+WEBHOOK_URL_BASE = "https://{}:{}".format(conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
 TOKEN = os.environ['TOKEN']
+WEBHOOK_URL_PATH = "/{}/".format(TOKEN)
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, threaded=False)
 
 bot.remove_webhook()
-bot.set_webhook(url="https://infinite-chamber-18600.herokuapp.com/bot")
+bot.set_webhook(url=WEBHOOK_URL_BASE+WEBHOOK_URL_PATH)
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -39,7 +42,7 @@ def scorn_insolence(message):
 def index():
     return 'ok'
 
-@app.route("/bot", methods=['POST'])
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
 def webhook():
     if flask.request.headers.get('content-type') == 'application/json':
         json_string = flask.request.get_data().decode('utf-8')
@@ -49,7 +52,14 @@ def webhook():
     else:
         flask.abort(403)
 
+
+app.run(host=WEBHOOK_LISTEN,
+        port=WEBHOOK_PORT,
+        ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+debug=True)
+
+
 if __name__ == '__main__':
     app.debug = True
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
