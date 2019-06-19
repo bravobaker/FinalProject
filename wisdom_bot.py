@@ -60,5 +60,4 @@ bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
 
 if __name__ == '__main__':
     app.run(host=WEBHOOK_LISTEN,
-            port=conf.WEBHOOK_PORT,
-            debug=True)
+            port=conf.WEBHOOK_PORT)
