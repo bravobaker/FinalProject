@@ -18,10 +18,6 @@ bot.set_webhook(url="https://infinite-chamber-18600.herokuapp.com/bot")
 
 app = Flask(__name__)
 
-@app.route("/", methods=['GET', 'HEAD'])
-def index():
-    return 'ok'
-
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.send_message(message.chat.id, 'Greetings, neophite. Thou hast come here to hear of my teachings. Ask me a question, or simply type "/wisdom", and I shall share my wisdom with thou.')
