@@ -39,6 +39,10 @@ def answer_question(message):
 def scorn_insolence(message):
     bot.send_message(message.chat.id, random.choice(NOT_QUESTIONS))
 
+@app.route("/", methods=['GET', 'HEAD'])
+def index():
+    return 'ok'
+
 @app.route("/bot", methods=['POST'])
 def webhook():
     if flask.request.headers.get('content-type') == 'application/json':
