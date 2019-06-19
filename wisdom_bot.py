@@ -55,4 +55,4 @@ def webhook():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(conf.WEBHOOK_HOST, port=conf.WEBHOOK_PORT)
+    app.run(host=conf.WEBHOOK_HOST, port=conf.WEBHOOK_PORT)
