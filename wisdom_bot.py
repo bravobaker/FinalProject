@@ -13,6 +13,7 @@ NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather -
 WEBHOOK_URL_BASE = "https://{}:{}".format(conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
 TOKEN = os.environ['TOKEN']
 WEBHOOK_URL_PATH = "/{}/".format(TOKEN)
+WEBHOOK_LISTEN = '0.0.0.0'
 
 bot = telebot.TeleBot(TOKEN, threaded=False)
 
@@ -52,14 +53,6 @@ def webhook():
     else:
         flask.abort(403)
 
-
-app.run(host=WEBHOOK_LISTEN,
-        port=WEBHOOK_PORT,
-        ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
-debug=True)
-
-
 if __name__ == '__main__':
     app.debug = True
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
+    app.run(conf.WEBHOOK_HOST, port=conf.WEBHOOK_PORT)
