@@ -59,5 +59,7 @@ time.sleep(0.1)
 bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
 
 if __name__ == '__main__':
-    app.run(host=WEBHOOK_LISTEN,
-            port=conf.WEBHOOK_PORT)
+    import os
+    app.debug = True
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
