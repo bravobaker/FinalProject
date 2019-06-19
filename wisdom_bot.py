@@ -14,9 +14,6 @@ NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather -
 TOKEN = os.environ['TOKEN']
 WEBHOOK_LISTEN = '0.0.0.0'
 
-WEBHOOK_SSL_CERT = './webhook_cert.pem'  # Path to the ssl certificate
-WEBHOOK_SSL_PRIV = './webhook_pkey.pem' # Path to the ssl private key
-
 WEBHOOK_URL_BASE = "https://%s:%s" % (conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
 WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
 
@@ -59,11 +56,9 @@ bot.remove_webhook()
 
 time.sleep(0.1)
 
-bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
-certificate=open(WEBHOOK_SSL_CERT, 'r'))
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
 
 if __name == '__main__':
     app.run(host=WEBHOOK_LISTEN,
             port=WEBHOOK_PORT,
-            ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
-    debug=True)
+            debug=True)
