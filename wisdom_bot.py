@@ -21,19 +21,6 @@ bot = telebot.TeleBot(TOKEN, threaded=False)
 
 app = flask.Flask(__name__)
 
-@app.route("/", methods=['GET', 'HEAD'])
-def index():
-    return 'ok'
-
-@app.route(WEBHOOK_URL_PATH, methods=['POST'])
-def webhook():
-    if flask.request.headers.get('content-type') == 'application/json':
-        json_string = flask.request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return ''
-    else:
-        flask.abort(403)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -52,14 +39,16 @@ def answer_question(message):
 def scorn_insolence(message):
     bot.send_message(message.chat.id, random.choice(NOT_QUESTIONS))
 
-bot.remove_webhook()
+@app.route('/' + TOKEN, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+return "!", 200
 
-time.sleep(0.1)
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=conf.WEBHOOK_HOST + TOKEN)
+return "!", 200
 
-bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
-
-if __name__ == '__main__':
-    import os
-    app.debug = True
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+if __name__ == "__main__":
+server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
