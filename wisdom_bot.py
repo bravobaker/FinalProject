@@ -17,7 +17,7 @@ WEBHOOK_LISTEN = '0.0.0.0'
 WEBHOOK_SSL_CERT = './webhook_cert.pem'  # Path to the ssl certificate
 WEBHOOK_SSL_PRIV = './webhook_pkey.pem' # Path to the ssl private key
 
-EBHOOK_URL_BASE = "https://%s:%s" % (conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
+WEBHOOK_URL_BASE = "https://%s:%s" % (conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
 WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
 
 bot = telebot.TeleBot(TOKEN, threaded=False)
