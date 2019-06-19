@@ -1,14 +1,14 @@
 import telebot
-import conf
 from wisdom_generation import generate_wisdom, is_question, not_question
 import random
+import os
 
 NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather - action.',
                 'Tell me what answers you seek.',
                 'Wisdom is to be beseeched for. Ask a question.'
                 'You shall not think lightly of the Wisdom I am about to bestow upon you. Ask a question and ponder the answer.']
 
-
+TOKEN = os.environ['TOKEN']
 
 telebot.apihelper.proxy = {'proxy_url':'socks5://geek:socks@t.geekclass.ru:7777'}
 bot = telebot.TeleBot(conf.TOKEN)
