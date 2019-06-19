@@ -4,23 +4,39 @@ from wisdom_generation import generate_wisdom, is_question, not_question
 import random
 import os
 import flask
+import time
 
 NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather - action.',
                 'Tell me what answers you seek.',
                 'Wisdom is to be beseeched for. Ask a question.'
                 'You shall not think lightly of the Wisdom I am about to bestow upon you. Ask a question and ponder the answer.']
 
-WEBHOOK_URL_BASE = "https://{}:{}".format(conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
 TOKEN = os.environ['TOKEN']
-WEBHOOK_URL_PATH = "/{}/".format(TOKEN)
 WEBHOOK_LISTEN = '0.0.0.0'
+
+WEBHOOK_SSL_CERT = './webhook_cert.pem'  # Path to the ssl certificate
+WEBHOOK_SSL_PRIV = './webhook_pkey.pem' # Path to the ssl private key
+
+EBHOOK_URL_BASE = "https://%s:%s" % (conf.WEBHOOK_HOST, conf.WEBHOOK_PORT)
+WEBHOOK_URL_PATH = "/%s/" % (TOKEN)
 
 bot = telebot.TeleBot(TOKEN, threaded=False)
 
-bot.remove_webhook()
-bot.set_webhook(url=WEBHOOK_URL_BASE+WEBHOOK_URL_PATH)
-
 app = flask.Flask(__name__)
+
+@app.route("/", methods=['GET', 'HEAD'])
+def index():
+    return 'ok'
+
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        flask.abort(403)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -39,22 +55,15 @@ def answer_question(message):
 def scorn_insolence(message):
     bot.send_message(message.chat.id, random.choice(NOT_QUESTIONS))
 
-@app.route("/", methods=['GET', 'HEAD'])
-def index():
-    return 'ok'
+bot.remove_webhook()
 
-@app.route(WEBHOOK_URL_PATH, methods=['POST'])
-def webhook():
-    if flask.request.headers.get('content-type') == 'application/json':
-        json_string = flask.request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return ''
-    else:
-        flask.abort(403)
+time.sleep(0.1)
 
-if __name__ == '__main__':
-    import os
-    app.debug = True
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+certificate=open(WEBHOOK_SSL_CERT, 'r'))
+
+if __name == '__main__':
+    app.run(host=WEBHOOK_LISTEN,
+            port=WEBHOOK_PORT,
+            ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+    debug=True)
