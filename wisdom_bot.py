@@ -11,7 +11,7 @@ NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather -
 
 TOKEN = os.environ['TOKEN']
 
-bot = telebot.TeleBot(conf.TOKEN)
+bot = telebot.TeleBot(TOKEN)
 
 bot.remove_webhook()
 bot.set_webhook(url="https://infinite-chamber-18600.herokuapp.com/bot")
