@@ -2,6 +2,7 @@ import telebot
 from wisdom_generation import generate_wisdom, is_question, not_question
 import random
 import os
+from flask import Flask
 
 NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather - action.',
                 'Tell me what answers you seek.',
@@ -10,9 +11,16 @@ NOT_QUESTIONS = ['These are not the answers that you seek, acolyte, but rather -
 
 TOKEN = os.environ['TOKEN']
 
-telebot.apihelper.proxy = {'proxy_url':'socks5://geek:socks@t.geekclass.ru:7777'}
 bot = telebot.TeleBot(conf.TOKEN)
 
+bot.remove_webhook()
+bot.set_webhook(url="https://infinite-chamber-18600.herokuapp.com/bot")
+
+app = Flask(__name__)
+
+@app.route("/", methods=['GET', 'HEAD'])
+def index():
+    return 'ok'
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -31,5 +39,17 @@ def answer_question(message):
 def scorn_insolence(message):
     bot.send_message(message.chat.id, random.choice(NOT_QUESTIONS))
 
+@app.route("/bot", methods=['POST'])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        flask.abort(403)
+
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+    app.debug = True
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
