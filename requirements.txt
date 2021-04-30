@@ -19,5 +19,5 @@ requests==2.7.0
 six==1.12.0
 telebot==0.0.3
 Unidecode==1.1.0
-urllib3==1.25.3
+urllib3==1.25.8
 Werkzeug==0.15.4
